@@ -17,5 +17,11 @@ use App\Http\Controllers\AuthController;
 |
 */
 
+//Public API
 Route::post('/login',[AuthController::class,'login']);
 Route::post('/register',[AuthController::class,'register']);
+
+//Protected API
+Route::group(['middleware' => ['auth:sanctum']],function(){
+    Route::post('/logout',[AuthController::class,'logout']); 
+});

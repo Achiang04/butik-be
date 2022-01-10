@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use App\Models\User;
 use Facade\FlareClient\Http\Response;
+use Illuminate\Http\Client\ResponseSequence;
 use Illuminate\Support\Facades\Response as FacadesResponse;
 use Illuminate\Validation\ValidationException;
 
@@ -13,7 +14,8 @@ use Illuminate\Validation\ValidationException;
 class AuthController extends Controller
 {
     public function login(Request $request){
-        $credentials = $request->validate([
+
+        $request->validate([
             'email' => 'required|email:dns',
             'password' => 'required',
         ]);
@@ -22,11 +24,16 @@ class AuthController extends Controller
 
         if (! $user || ! Hash::check($request->password, $user->password)) {
             throw ValidationException::withMessages([
-                'email' => ['The provided credentials are incorrect.'],
+                'message' => 'Incorrect email or password',
             ]);
         }
     
-        return $user->createToken($user->email)->plainTextToken;
+        $token = $user->createToken($user->email)->plainTextToken;
+
+        return response([
+            'user' => $user,
+            'token' => $token
+        ],200);
     }
 
     public function register(Request $request){
@@ -46,9 +53,14 @@ class AuthController extends Controller
 
         return Response([
             'message' => 'User Has Been Registered'
-        ],200);
+        ],201);
     }
 
-    
+    public function logout(Request $request){
+        $request->user()->tokens()->delete(); 
 
+        return Response([
+            'message' => 'Logged Out'
+        ],201);
+    }
 }
