@@ -3,18 +3,13 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Hash;
 use App\Models\User;
-use Facade\FlareClient\Http\Response;
-use Illuminate\Http\Client\ResponseSequence;
-use Illuminate\Support\Facades\Response as FacadesResponse;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
-
 
 class AuthController extends Controller
 {
-    public function login(Request $request){
-
+    public function login(Request $request){ 
         $request->validate([
             'email' => 'required|email:dns',
             'password' => 'required',
@@ -34,26 +29,6 @@ class AuthController extends Controller
             'user' => $user,
             'token' => $token
         ],200);
-    }
-
-    public function register(Request $request){
-        $request->validate([
-            'name' => 'required',
-            'email' => 'required|email:dns|unique:users',
-            'password' => 'required',
-        ]);
-
-        $registerData = [
-            'name' => $request->name,
-            'email' => $request->email,
-            'password' => bcrypt($request->password),
-        ];
-
-        User::create($registerData);
-
-        return Response([
-            'message' => 'User Has Been Registered'
-        ],201);
     }
 
     public function logout(Request $request){
